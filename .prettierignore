@@ -1,0 +1,9 @@
+# Ignore artifacts:
+build
+coverage
+.vscode
+.editorconfig
+tsconfig.json
+vitest.config.mts
+worker-configuration.d.ts
+wrangler.jsonc

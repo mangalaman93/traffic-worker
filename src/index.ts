@@ -11,8 +11,57 @@
  * Learn more at https://developers.cloudflare.com/workers/
  */
 
+import { Client } from 'pg';
+
+interface Env {
+	POSTGRES_URL: string;
+}
+
+const queryCurrentTraffic = `SELECT yellow, red, dark_red, ts, x, y FROM traffic
+	WHERE ts = (SELECT MAX(ts) FROM traffic)`;
+const queryCongestedTraffic = `SELECT x, y, yellow, red, dark_red FROM traffic
+	WHERE ts = (SELECT MAX(ts) FROM traffic)
+	ORDER BY (yellow + red + dark_red) DESC
+	LIMIT 10`;
+
 export default {
 	async fetch(request, env, ctx): Promise<Response> {
-		return new Response('Hello World!');
+		const url = new URL(request.url);
+		switch (url.pathname) {
+			case '/current':
+				return await handleCurrent(env);
+
+			case '/congested':
+				return await handleCongested(env);
+
+			case '/health':
+				return new Response('{"status": "ok"}', {
+					status: 200,
+					headers: { 'Content-Type': 'application/json' },
+				});
+
+			default:
+				return new Response('Not found', { status: 404 });
+		}
 	},
 } satisfies ExportedHandler<Env>;
+
+async function handleCurrent(env: Env): Promise<Response> {
+	const sql = new Client({ connectionString: env.POSTGRES_URL });
+	await sql.connect();
+
+	const result = await sql.query(queryCurrentTraffic);
+	return new Response(JSON.stringify(result.rows), {
+		headers: { 'Content-Type': 'application/json' },
+	});
+}
+
+async function handleCongested(env: Env): Promise<Response> {
+	const sql = new Client({ connectionString: env.POSTGRES_URL });
+	await sql.connect();
+
+	const result = await sql.query(queryCongestedTraffic);
+	return new Response(JSON.stringify(result.rows), {
+		headers: { 'Content-Type': 'application/json' },
+	});
+}

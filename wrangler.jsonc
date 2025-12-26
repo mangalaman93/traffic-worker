@@ -6,10 +6,11 @@
 	"$schema": "node_modules/wrangler/config-schema.json",
 	"name": "traffic-worker",
 	"main": "src/index.ts",
+	"compatibility_flags": ["nodejs_compat"],
 	"compatibility_date": "2025-12-25",
 	"observability": {
-		"enabled": true
-	}
+		"enabled": true,
+	},
 	/**
 	 * Smart Placement
 	 * https://developers.cloudflare.com/workers/configuration/smart-placement/#smart-placement
@@ -27,7 +28,8 @@
 	 * Note: Use secrets to store sensitive data.
 	 * https://developers.cloudflare.com/workers/configuration/secrets/
 	 */
-	// "vars": {  "MY_VARIABLE": "production_value" }
+	"vars": {
+	},
 	/**
 	 * Static Assets
 	 * https://developers.cloudflare.com/workers/static-assets/binding/
