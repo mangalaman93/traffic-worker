@@ -24,6 +24,12 @@ const queryCongestedTraffic = `SELECT x, y, yellow, red, dark_red FROM traffic
 	ORDER BY (yellow + red + dark_red) DESC
 	LIMIT 10`;
 
+const commonHeaders = {
+	'Content-Type': 'application/json',
+	'Access-Control-Allow-Origin': '*',
+	'Access-Control-Allow-Methods': 'GET, OPTIONS',
+};
+
 export default {
 	async fetch(request, env, ctx): Promise<Response> {
 		const url = new URL(request.url);
@@ -37,11 +43,11 @@ export default {
 			case '/health':
 				return new Response('{"status": "ok"}', {
 					status: 200,
-					headers: { 'Content-Type': 'application/json' },
+					headers: commonHeaders,
 				});
 
 			default:
-				return new Response('Not found', { status: 404 });
+				return new Response('', { status: 404 });
 		}
 	},
 } satisfies ExportedHandler<Env>;
@@ -52,7 +58,7 @@ async function handleCurrent(env: Env): Promise<Response> {
 
 	const result = await sql.query(queryCurrentTraffic);
 	return new Response(JSON.stringify(result.rows), {
-		headers: { 'Content-Type': 'application/json' },
+		headers: commonHeaders,
 	});
 }
 
@@ -62,6 +68,6 @@ async function handleCongested(env: Env): Promise<Response> {
 
 	const result = await sql.query(queryCongestedTraffic);
 	return new Response(JSON.stringify(result.rows), {
-		headers: { 'Content-Type': 'application/json' },
+		headers: commonHeaders,
 	});
 }
