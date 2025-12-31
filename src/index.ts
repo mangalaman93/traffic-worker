@@ -39,6 +39,9 @@ const queryCurrentTraffic = `WITH grid_stats AS (
 			x,
 			y,
 			ts,
+			yellow,
+			red,
+			dark_red,
 			(yellow * 1 + red * 2 + dark_red * 3) AS latest_severity
 		FROM traffic
 		WHERE ts >= NOW() - INTERVAL '30 minutes'
@@ -48,6 +51,9 @@ const queryCurrentTraffic = `WITH grid_stats AS (
 		l.x,
 		l.y,
 		l.ts,
+		l.yellow,
+		l.red,
+		l.dark_red,
 		l.latest_severity,
 		g.p95,
 		g.p99
